@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Farmacia — Cuevo</title>
+  <meta name="description" content="Farmacia Virgen de los Remedios en Cuevo. Catálogo con carrito, búsqueda, filtros, envío por WhatsApp y panel simple de administración."/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💊</text></svg>">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e" />
+
+  <script>
+    window.tailwind = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5', 100:'#d1fae5', 200:'#a7f3d0', 300:'#6ee7b7', 400:'#34d399', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d'
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 25px -10px rgba(34, 197, 94, .25)'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <style>
+  /* Animaciones suaves */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseButton {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
+  }
+}
+
+@keyframes cart-glow {
+  0% { box-shadow: 0 0 0 rgba(34, 197, 94, 0.7); }
+  50% { box-shadow: 0 0 10px rgba(34, 197, 94, 0.9); }
+  100% { box-shadow: 0 0 0 rgba(34, 197, 94, 0.7); }
+}
+
+.cart-glow {
+  animation: cart-glow 2s infinite;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+/* Botón pulsante */
+.btn-primary {
+  animation: pulseButton 2s infinite;
+}
+
+/* Navbar sticky dinámica */
+.navbar-glass.scrolled {
+  background: rgba(15, 23, 42, 0.85);
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Transición hero parallax */
+.hero-bg {
+  background-attachment: fixed;
+}
+    /* Fuente del sistema y fondo base */
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:#0f172a;color:#fff}
+    .hero-bg{background:linear-gradient(rgba(34,197,94,.85),rgba(21,128,61,.85)),url('https://images.unsplash.com/photo-1614975470486-613b87ec6dcd?auto=format&fit=crop&w=1470&q=80');background-size:cover;background-position:center}
+    .cart-drawer{transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+    .cart-open{transform:translateX(0%)}
+    .cart-closed{transform:translateX(100%)}
+    .product-img{object-fit:cover;height:11rem}
+    /* Utilidad sencilla para line-clamp sin plugin */
+    .line-clamp-1{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    /* Respetar usuarios con motion reducido */
+    @media (prefers-reduced-motion: reduce){
+      *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important}
+    }
+    
+  /* ---------------------------------------------------------------------- */
+  /* -- Mejoras profesionales: Estilo para los botones de "Agregar al carrito" -- */
+  /* ---------------------------------------------------------------------- */
+  .btn-add-to-cart {
+      /* Colores, padding y forma */
+      background-color: #22c55e;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 14px;
+      /* Sombra y transiciones */
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+      transition: all 0.3s ease;
+  }
+  
+  .btn-add-to-cart:hover {
+      background-color: #16a34a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+  }
+  
+  .btn-add-to-cart:active {
+      transform: translateY(0);
+      box-shadow: none;
+  }
+  .btn-disabled {
+    background-color: #4a5568 !important;
+    font-style: italic;
+    cursor: not-allowed;
+  }
+
+  /* Estilos para el modal de vista de detalle */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: #0f172a;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid #1f2937;
+  }
+  
+  .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  /* NUEVO: Efecto de iluminación y expansión para los productos */
+  .product-card-hover {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  }
+  
+  .product-card-hover:hover {
+    transform: scale(1.03); /* Se agranda un 3% */
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); /* Sombra de color verde */
+  }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="padding:16px;margin:16px;border-radius:12px;background:#111827;color:#e5e7eb;border:1px solid #1f2937">
+      Esta aplicación requiere JavaScript. Si ves solo la pantalla azul oscuro, asegúrate de tener conexión a internet
+      (cargamos React/Babel/Tailwind desde CDNs) o usa un servidor local. WhatsApp: <strong>+591 71317450</strong>.
+    </div>
+  </noscript>
+
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="env,react">
+  // Hook para navbar sticky animada
+function useScrollNavbar() {
+  useEffect(() => {
+    const navbar = document.querySelector(".navbar-glass");
+    const onScroll = () => {
+      if (window.scrollY > 30) navbar.classList.add("scrolled");
+      else navbar.classList.remove("scrolled");
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+}
+
+    const {useState, useEffect, useMemo, useRef} = React;
+
+    // ---------- UTILIDADES ----------
+    const PHONE_WHATSAPP = '59171317450';
+    const currencyFmt = new Intl.NumberFormat('es-BO', { style:'currency', currency:'BOB', minimumFractionDigits: 2 });
+    const currency = (n)=> currencyFmt.format(Number(n||0));
+
+    // Toast muy simple
+    function useToast(){
+      const [msg, setMsg] = useState("");
+      const [open, setOpen] = useState(false);
+      const timer = useRef(null);
+      const show = (text, ms=2000)=>{
+        setMsg(text); setOpen(true);
+        clearTimeout(timer.current);
+        timer.current = setTimeout(()=> setOpen(false), ms);
+      };
+      return { open, msg, show };
+    }
+
+    function Toast({open, msg}){
+      return (
+        <div aria-live="polite" className={`fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] transition ${open? 'opacity-100 translate-y-0':'opacity-0 translate-y-2 pointer-events-none'}`}>
+          <div className="bg-slate-900/95 backdrop-blur border border-slate-800 text-white px-4 py-2 rounded-xl shadow-soft flex items-center gap-2">
+            <i className="fas fa-check-circle text-green-400"></i>
+            <span className="text-sm">{msg}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- NAVBAR ----------
+    function Navbar({setPage, cartCount, onOpenCart}){
+      const [open, setOpen] = useState(false);
+      return (
+        <nav className="bg-slate-900/90 backdrop-blur sticky top-0 z-50 border-b border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <button className="text-brand-400 font-bold text-xl" onClick={()=>setPage('home')} aria-label="Ir al inicio">Farmacia</button>
+              <span className="hidden sm:inline text-slate-400">Virgen de los Remedios</span>
+            </div>
+            <div className="hidden md:flex items-center gap-6">
+              <a href="#home" className="hover:text-brand-400 transition-colors duration-300">Inicio</a>
+              <a href="#services" className="hover:text-brand-400 transition-colors duration-300">Servicios</a>
+              <a href="#catalog" className="hover:text-brand-400 transition-colors duration-300">Productos</a>
+              <a href="#contact" className="hover:text-brand-400 transition-colors duration-300">Contacto</a>
+              <button onClick={()=>setPage('admin')} className="bg-brand-500 px-3 py-1 rounded-lg text-sm hover:bg-brand-600 transition">Admin</button>
+              <button onClick={onOpenCart} className="relative" aria-label="Abrir carrito">
+                <i className="fas fa-shopping-cart text-brand-400 text-xl"></i>
+                {cartCount>0 && <span className="absolute -top-2 -right-2 bg-brand-500 text-xs text-white font-bold rounded-full px-1.5 py-0.5 cart-glow">{cartCount}</span>}
+              </button>
+            </div>
+            <div className="md:hidden flex items-center gap-3">
+              <button onClick={onOpenCart} className="relative" aria-label="Abrir carrito">
+                <i className="fas fa-shopping-cart text-brand-400 text-xl"></i>
+                {cartCount>0 && <span className="absolute -top-1 -right-2 bg-brand-500 text-white text-[10px] font-bold rounded-full px-1 cart-glow">{cartCount}</span>}
+              </button>
+              <button onClick={()=>setOpen(v=>!v)} aria-label="Abrir menú"><i className="fas fa-bars text-xl"></i></button>
+            </div>
+          </div>
+          {open && (
+            <div className="md:hidden bg-slate-800/95 px-4 py-3 space-y-2">
+              <a href="#home" onClick={()=>setOpen(false)} className="block">Inicio</a>
+              <a href="#services" onClick={()=>setOpen(false)} className="block">Servicios</a>
+              <a href="#catalog" onClick={()=>setOpen(false)} className="block">Productos</a>
+              <a href="#contact" onClick={()=>setOpen(false)} className="block">Contacto</a>
+              <button onClick={()=>{ setOpen(false); setPage('admin'); }} className="bg-brand-500 px-3 py-1 rounded">Admin</button>
+            </div>
+          )}
+        </nav>
+      );
+    }
+
+    // ---------- HERO ----------
+    function Hero() {
+  return (
+    <section
+      id="home"
+      className="hero-bg relative flex items-center justify-center text-center px-4 h-96 md:h-[28rem] bg-cover bg-center"
+      style={{
+        backgroundImage: `url('https://ceb.bo/wp-content/uploads/2023/09/Remedios-2-1024x576.jpg')`
+      }}
+    >
+      <div className="hero-overlay absolute inset-0"></div>
+      <div className="hero-content relative z-10 fade-in-up">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg">
+          Farmacia Virgen de los Remedios
+        </h1>
+        <p className="mt-3 text-lg text-slate-100/90">
+          Tu salud, nuestro compromiso en Cuevo.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+
+    // ---------- INFO ----------
+    function Info(){
+      const mapUrl = encodeURI(`https://www.google.com/maps/search/?api=1&query=Farmacia Virgen de los Remedios, Cuevo, Santa Cruz, Bolivia`);
+      return (
+        <section className="py-12 px-6 max-w-6xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-brand-400 mb-8">Información General</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            <Card icon="fa-map-marker-alt" title="Ubicación">
+              <div>
+                <p>Calle Sucre, entre Bolívar y 6 de Agosto, Cuevo</p>
+                <div className="mt-3">
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-500 rounded-full text-white text-sm font-semibold hover:bg-brand-600 transition">
+                    <i className="fas fa-map-marked-alt"></i> Cómo llegar
+                  </a>
+                </div>
+              </div>
+            </Card>
+            <Card icon="fa-user-nurse" title="Farmacéutica responsable">Lic. Lenni Escudero Andrade</Card>
+            <Card icon="fa-clock" title="Horarios">
+              <div>
+                <p>Mediodía: 12:00–15:00</p>
+                <p>Noches: desde 19:00</p>
+                <p>Fines de semana</p>
+              </div>
+            </Card>
+            <Card icon="fa-whatsapp" title="Contacto">
+                <a href={`https://wa.me/${PHONE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline">
+                    WhatsApp: +591 71317450
+                </a>
+            </Card>
+          </div>
+        </section>
+      );
+    }
+
+    function Card({icon, title, children}){
+      return (
+        <div className="bg-slate-900 p-5 rounded-2xl shadow product-card-hover fade-in-up">
+          <div className="flex items-start gap-3">
+            <div className="p-3 bg-slate-800 rounded-lg"><i className={`fas ${icon} text-brand-400 text-2xl`}></i></div>
+            <div>
+              <h3 className="font-semibold">{title}</h3>
+              <div className="text-slate-300 text-sm">
+                {children}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ---------- SERVICIOS ----------
+    function Servicios(){
+      const items = [
+        { icon: 'fa-pills', title: 'Venta de Medicamentos', desc: 'Genéricos y de marca a tu alcance.' },
+        { icon: 'fa-user-md', title: 'Asesoramiento', desc: 'Consulta con nuestra profesional.' },
+        { icon: 'fa-truck', title: 'Delivery', desc: 'Coordinamos envíos locales (según disponibilidad).' }
+      ];
+      return (
+        <section id="services" className="py-12 px-6 bg-slate-800/10">
+          <h2 className="text-2xl font-bold text-center mb-8 text-brand-400">Nuestros Servicios</h2>
+          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+            {items.map((s,i)=> (
+              <div key={i} className="bg-slate-900 p-6 rounded-2xl text-center shadow product-card-hover fade-in-up" style={{animationDelay: `${i * 100}ms`}}>
+                <i className={`fas ${s.icon} text-brand-400 text-4xl mb-4`}></i>
+                <h3 className="font-semibold mb-2">{s.title}</h3>
+                <p className="text-slate-300 text-sm">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // ---------- MODAL DE DETALLE / EDICIÓN ----------
+    function ProductModal({product, onClose, onAdd, onSave, isEditing}){
+      if(!product) return null;
+
+      const [form, setForm] = useState(isEditing ? { ...product } : {});
+      const [localImg, setLocalImg] = useState(product.img);
+      const [errors, setErrors] = useState({});
+      const hasStock = product.stock > 0;
+
+      useEffect(() => {
+        if (isEditing) {
+          setForm({ ...product, precio: String(product.precio), stock: Number(product.stock) });
+          setLocalImg(product.img);
+        }
+      }, [product, isEditing]);
+
+      const validateForm = () => {
+        const newErrors = {};
+        if (!form.nombre?.trim()) newErrors.nombre = 'El nombre es obligatorio.';
+        if (!form.precio || isNaN(Number(form.precio))) newErrors.precio = 'El precio debe ser un número.';
+        if (!form.stock || isNaN(Number(form.stock))) newErrors.stock = 'El stock debe ser un número.';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+      };
+
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+        if (errors[name]) {
+          setErrors({ ...errors, [name]: '' });
+        }
+      };
+
+      const handleFile = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          setLocalImg(ev.target.result);
+          setForm(prev => ({ ...prev, img: ev.target.result }));
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const handleSave = () => {
+        if (!validateForm()) return;
+
+        const updatedProduct = {
+          ...form,
+          precio: Number(form.precio) || 0,
+          stock: Number(form.stock) || 0,
+        };
+        onSave(updatedProduct);
+        onClose();
+      };
+      
+      return ReactDOM.createPortal(
+        <div className="modal-overlay">
+          <div className="modal-content md:flex md:items-start md:gap-8 max-w-4xl">
+            <button onClick={onClose} className="modal-close"><i className="fas fa-times"></i></button>
+            <div className="md:w-1/2">
+              <img src={localImg || 'https://medac.es/sites/default/files/styles/img_blog_big_retina/public/blog/destacadas/Farmacia%20hospitalaria.jpg?itok=yhXMoJOv'} alt={product.nombre} className="w-full h-auto rounded-lg" />
+            </div>
+            <div className="md:w-1/2 mt-6 md:mt-0">
+              {isEditing ? (
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-4">Editar Producto</h2>
+                  <div className="space-y-3">
+                    <div>
+                      <input name="nombre" value={form.nombre || ''} onChange={handleChange} placeholder="Nombre*" className="w-full p-2 rounded text-black" />
+                      {errors.nombre && <p className="text-red-400 text-xs mt-1">{errors.nombre}</p>}
+                    </div>
+                    <input name="marca" value={form.marca || ''} onChange={handleChange} placeholder="Marca" className="w-full p-2 rounded text-black" />
+                    <input name="uso" value={form.uso || ''} onChange={handleChange} placeholder="Uso (ej. analgésico)" className="w-full p-2 rounded text-black" />
+                    <textarea name="descripcion" value={form.descripcion || ''} onChange={handleChange} placeholder="Descripción completa del producto (para qué sirve, cómo usar, advertencias...)" rows="4" className="w-full p-2 rounded text-black"></textarea>
+                    <div>
+                      <input name="precio" type="number" step="0.01" value={form.precio} onChange={handleChange} placeholder="Precio*" className="w-full p-2 rounded text-black" />
+                      {errors.precio && <p className="text-red-400 text-xs mt-1">{errors.precio}</p>}
+                    </div>
+                    <div>
+                      <input name="stock" type="number" value={form.stock} onChange={handleChange} placeholder="Stock*" className="w-full p-2 rounded text-black" />
+                      {errors.stock && <p className="text-red-400 text-xs mt-1">{errors.stock}</p>}
+                    </div>
+                    <select name="categoria" value={form.categoria || 'medicamentos'} onChange={handleChange} className="w-full p-2 rounded text-black">
+                      <option value="medicamentos">Medicamentos</option>
+                      <option value="bebes">Bebés</option>
+                      <option value="cuidado">Cuidado Personal</option>
+                    </select>
+                    <label className="block text-sm text-slate-400 mt-2">
+                        Cambiar imagen:
+                        <input type="file" accept="image/*" onChange={handleFile} className="w-full p-2 mt-1 rounded bg-slate-800 text-sm text-slate-300" />
+                    </label>
+                  </div>
+                  <div className="mt-8 flex gap-4">
+                    <button onClick={handleSave} disabled={!form.nombre || !form.precio || !form.stock || errors.nombre || errors.precio || errors.stock} className={`flex-1 px-4 py-2 rounded-full font-semibold ${!form.nombre || !form.precio || !form.stock || errors.nombre || errors.precio || errors.stock ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-brand-500 hover:bg-brand-600'}`}>Guardar Cambios</button>
+                    <button onClick={onClose} className="flex-1 px-4 py-2 bg-slate-700 rounded-full text-sm font-semibold hover:bg-slate-600 transition">Cancelar</button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">{product.nombre}</h2>
+                  <p className="text-xl text-brand-400 font-bold mb-4">{currency(product.precio)}</p>
+                  <div className="space-y-3 text-slate-300">
+                    <p><strong>Marca:</strong> {product.marca || 'No especificada'}</p>
+                    <p><strong>Uso:</strong> {product.uso || 'No especificado'}</p>
+                    {product.descripcion && <p>{product.descripcion}</p>}
+                  </div>
+                  <div className="mt-8 flex gap-4">
+                    <button onClick={onAdd} disabled={!hasStock} className={`flex-1 flex items-center justify-center gap-2 ${hasStock ? 'btn-add-to-cart':'btn-disabled'}`}>
+                      {hasStock ? <> <i className="fas fa-cart-plus"></i> Agregar al Carrito</> : 'Agotado'}
+                    </button>
+                    <button onClick={onClose} className="flex-1 px-4 py-2 bg-slate-700 rounded-full text-sm font-semibold hover:bg-slate-600 transition">
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      );
+    }
+
+    // ---------- TARJETA PRODUCTO ----------
+    function ProductoCard({product, onAdd, onView, onDelete, onEdit}){
+      const src = product.img && typeof product.img === 'string' && product.img.length>0 ? product.img : 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=60';
+      const [loaded, setLoaded] = useState(false);
+      const [added, setAdded] = useState(false);
+      const hasStock = product.stock > 0;
+
+      const handleAdd = () => {
+        onAdd(product);
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1000);
+      };
+
+      return (
+        <div className="bg-slate-900 rounded-2xl overflow-hidden shadow product-card-hover relative">
+				  <div className="card-modern overflow-hidden fade-in-up">
+          <div className={`w-full h-44 ${loaded? '':'animate-pulse bg-slate-800'}`}></div>
+          <img loading="lazy" src={src} alt={product.nombre} className="w-full product-img -mt-44" onLoad={()=>setLoaded(true)} />
+          {product.stock > 0 && product.stock < 5 && (
+            <span className="absolute top-2 right-2 z-10 px-2 py-1 text-[10px] bg-yellow-400 text-slate-900 rounded-full font-bold">Stock bajo</span>
+          )}
+          <div className="p-4">
+            <h3 className="font-bold text-lg mb-1 line-clamp-1">{product.nombre}</h3>
+            <p className={`text-sm mb-1 ${hasStock ? 'text-green-400' : 'text-red-400'}`}>
+              Stock: {hasStock ? 'Disponible' : 'Agotado'}
+            </p>
+            <p className="text-sm text-slate-400 mb-1">Marca: {product.marca||'—'}</p>
+            <p className="text-sm text-slate-400 mb-2 line-clamp-2">{product.descripcion || product.uso || '—'}</p>
+            <p className="text-brand-400 font-bold text-lg mb-3">{currency(product.precio)}</p>
+            {onEdit ? (
+                <div className="flex items-center gap-2">
+                    <button onClick={onEdit} className="flex-1 bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded text-sm">Editar</button>
+                    <button onClick={onDelete} className="flex-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-sm">Borrar</button>
+                </div>
+            ) : (
+                <div className="flex items-center gap-2">
+                    <button onClick={onView} className="flex-1 px-4 py-2 bg-slate-700 rounded-full text-sm font-semibold hover:bg-slate-600 transition">Ver detalle</button>
+                    <button onClick={handleAdd} disabled={!hasStock || added} className={`flex-1 flex items-center justify-center gap-2 ${hasStock ? 'btn-add-to-cart':'btn-disabled'}`} aria-label={hasStock ? `Agregar ${product.nombre} al carrito` : 'Producto agotado'}>
+                        {hasStock ? (added ? 'Agregado!' : <><i className="fas fa-cart-plus"></i> Agregar</>) : 'Agotado'}
+                    </button>
+                </div>
+            )}
+          </div>
+        </div>
+		</div>
+      );
+    }
+
+    // Componente de paginación
+    function Pagination({ currentPage, totalPages, onPageChange }) {
+      const pageNumbers = [];
+      const range = 2; // Número de páginas a mostrar alrededor de la página actual
+
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - range && i <= currentPage + range)) {
+          pageNumbers.push(i);
+        }
+      }
+
+      // Añadir '...'
+      if (pageNumbers.length > 2 && pageNumbers[1] > 2) {
+        pageNumbers.splice(1, 0, '...');
+      }
+      if (pageNumbers.length > 2 && pageNumbers[pageNumbers.length - 2] < totalPages - 1) {
+        pageNumbers.splice(pageNumbers.length - 1, 0, '...');
+      }
+
+      return (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-2 rounded-lg bg-slate-800 disabled:opacity-50">Anterior</button>
+          {pageNumbers.map((number, index) => (
+            number === '...' ? (
+              <span key={index} className="px-3 py-2 text-slate-400">...</span>
+            ) : (
+              <button
+                key={index}
+                onClick={() => onPageChange(number)}
+                className={`px-3 py-2 rounded-lg text-sm transition ${number === currentPage ? 'bg-brand-500 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}
+              >
+                {number}
+              </button>
+            )
+          ))}
+          <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-3 py-2 rounded-lg bg-slate-800 disabled:opacity-50">Siguiente</button>
+        </div>
+      );
+    }
+
+    // ---------- CATÁLOGO ----------
+    function Catalogo({productos = [], onAddToCart, toast}){
+      const [filtro, setFiltro] = useState('todos');
+      const [q, setQ] = useState('');
+      const [orden, setOrden] = useState('relevancia');
+      const [page, setPage] = useState(1);
+      const [viewProduct, setViewProduct] = useState(null);
+      const porPagina = 12;
+      const categorias = ['todos','medicamentos','bebes','cuidado'];
+
+      const filtrados = useMemo(()=>{
+        const term = q.trim().toLowerCase();
+        let list = productos.filter(p => {
+          const byCat = filtro==='todos' || p.categoria===filtro;
+          const byTerm = !term || p.nombre.toLowerCase().includes(term) || (p.marca||'').toLowerCase().includes(term) || (p.uso||'').toLowerCase().includes(term);
+          return byCat && byTerm;
+        });
+        if(orden==='precio-asc') list = [...list].sort((a,b)=> (a.precio||0)-(b.precio||0));
+        if(orden==='precio-desc') list = [...list].sort((a,b)=> (b.precio||0)-(a.precio||0));
+        if(orden==='nombre-az') list = [...list].sort((a,b)=> String(a.nombre).localeCompare(String(b.nombre)));
+        return list;
+      }, [productos, filtro, q, orden]);
+
+      const totalPaginas = Math.max(1, Math.ceil(filtrados.length/porPagina));
+      const vista = filtrados.slice((page-1)*porPagina, page*porPagina);
+      useEffect(()=>{ setPage(1); }, [filtro, q, orden]);
+
+      return (
+        <section id="catalog" className="py-16 px-6">
+          <h2 className="text-3xl font-bold text-center mb-8 text-brand-400">Catálogo de Productos</h2>
+
+          <div className="max-w-5xl mx-auto mb-6 grid md:grid-cols-[1fr_auto_auto] gap-3 items-center">
+            <div className="flex items-center bg-slate-800 rounded-xl overflow-hidden ring-1 ring-slate-700">
+              <i className="fas fa-search px-3 text-slate-400" aria-hidden="true"></i>
+              <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar producto, marca o uso..." className="flex-1 px-3 py-2 bg-transparent focus:outline-none" />
+              {q && <button onClick={()=>setQ('')} className="px-3 text-slate-400 hover:text-white" aria-label="Limpiar búsqueda"><i className="fas fa-times"></i></button>}
+            </div>
+            <select value={orden} onChange={e=>setOrden(e.target.value)} className="px-3 py-2 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+              <option value="relevancia">Ordenar: Relevancia</option>
+              <option value="precio-asc">Precio: menor a mayor</option>
+              <option value="precio-desc">Precio: mayor a menor</option>
+              <option value="nombre-az">Nombre: A → Z</option>
+            </select>
+            <div className="flex gap-2 justify-end">
+              {categorias.map(c=> (
+                <button key={c} onClick={()=>setFiltro(c)} className={`px-3 py-2 rounded-lg transition border text-sm ${filtro===c? 'bg-brand-500 border-brand-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}>
+                  {c==='todos'? 'Todos' : c==='medicamentos'? 'Medicamentos' : c==='bebes'? 'Bebés' : 'Cuidado'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {vista.length ? vista.map((p,i)=> (
+              <ProductoCard key={`${p.nombre}-${i}`} product={p} onAdd={()=>{ onAddToCart(p); }} onView={()=>setViewProduct(p)} />
+            )) : (
+              <p className="col-span-full text-center text-slate-400">No se encontraron productos</p>
+            )}
+          </div>
+
+          {totalPaginas > 1 && (
+            <Pagination currentPage={page} totalPages={totalPaginas} onPageChange={setPage} />
+          )}
+          
+          <ProductModal product={viewProduct} onClose={()=>setViewProduct(null)} onAdd={()=>{ onAddToCart(viewProduct); toast.show('Agregado al carrito'); setViewProduct(null); }} />
+        </section>
+      );
+    }
+
+    // ---------- CARRITO (DRAWER) ----------
+    function CartDrawer({open, cart, setCart, onFinalize, onClose, toast, productos}){
+      const total = cart.reduce((s,i)=> s + (i.precio*(i.cant||1)), 0);
+      
+      const inc = (key) => {
+          setCart(prev => {
+              const item = prev.find(i => i.key === key);
+              if (!item) return prev;
+
+              const productInStock = productos.find(p => `${p.nombre}-${p.marca}-${p.precio}` === key);
+              if (!productInStock) return prev; // Producto no encontrado en el inventario
+              
+              const currentQuantity = item.cant || 1;
+              const newQuantity = currentQuantity + 1;
+
+              if (newQuantity > productInStock.stock) {
+                  toast.show(`Stock limitado. Solo quedan ${productInStock.stock} unidades.`);
+                  return prev; // No se actualiza el carrito
+              }
+              
+              return prev.map(i => i.key === key ? { ...i, cant: newQuantity } : i);
+          });
+      };
+      
+      const dec = (key)=> setCart(prev=> prev.map(i=> i.key===key? {...i, cant: Math.max(1,(i.cant||1)-1)} : i));
+      const remove = (key)=> setCart(prev=> prev.filter(i=> i.key!==key));
+      const clear = ()=> setCart([]);
+
+      const handleFinalize = () => {
+        if (cart.length === 0) {
+          toast.show('Tu carrito está vacío. ¡Agrega productos para finalizar tu pedido!');
+          return;
+        }
+        onFinalize();
+      };
+
+      return (
+        <div className={`fixed inset-0 z-50 flex ${open? '':'pointer-events-none'}`} aria-hidden={!open}>
+          <div className={`flex-1 bg-black/50 transition-opacity ${open? 'opacity-100' : 'opacity-0'}`} onClick={onClose}></div>
+          <aside className={`cart-drawer bg-slate-900 w-80 max-w-full h-full shadow-2xl flex flex-col ${open? 'cart-open':'cart-closed'}`} aria-label="Carrito de compras">
+            <div className="p-4 border-b border-slate-800 flex justify-between items-center">
+              <h3 className="font-bold text-lg">Tu carrito</h3>
+              <button onClick={onClose} className="p-2" aria-label="Cerrar carrito"><i className="fas fa-times"></i></button>
+            </div>
+            <div className="p-4 flex-1 overflow-auto space-y-3">
+              {cart.length===0 && <p className="text-slate-400">Aún no agregaste productos.</p>}
+              {cart.map(item=> {
+                const productInStock = productos.find(p => `${p.nombre}-${p.marca}-${p.precio}` === item.key);
+                return (
+                  <div key={item.key} className="flex items-center gap-3 bg-slate-800 p-2 rounded-lg">
+                    <img loading="lazy" src={item.img||'https://medac.es/sites/default/files/styles/img_blog_big_retina/public/blog/destacadas/Farmacia%20hospitalaria.jpg?itok=yhXMoJOv'} className="w-12 h-12 object-cover rounded" alt=""/>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm leading-tight line-clamp-1">{item.nombre}</p>
+                      <p className="text-xs text-slate-400">{currency(item.precio)}</p>
+                      {productInStock && <p className={`text-xs mt-1 ${productInStock.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>Stock: {productInStock.stock}</p>}
+                      <div className="flex items-center gap-2 mt-1">
+                        <button onClick={()=>dec(item.key)} className="px-2 py-0.5 bg-slate-700 rounded" aria-label="Disminuir">-</button>
+                        <span>{item.cant||1}</span>
+                        <button onClick={()=>inc(item.key)} disabled={productInStock && (item.cant || 1) >= productInStock.stock} className="px-2 py-0.5 bg-slate-700 rounded disabled:opacity-50" aria-label="Aumentar">+</button>
+                      </div>
+                    </div>
+                    <button onClick={()=>remove(item.key)} className="text-red-400" aria-label="Eliminar"><i className="fas fa-trash"></i></button>
+                  </div>
+                )})}
+            </div>
+            <div className="p-4 border-t border-slate-800">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-bold">Total</span>
+                <strong className="text-brand-400">{currency(total)}</strong>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={clear} className="flex-1 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg">Vaciar</button>
+                <button onClick={handleFinalize} disabled={cart.length === 0} className="flex-1 bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                  <i className="fab fa-whatsapp"></i> Finalizar
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      );
+    }
+
+    // ---------- ADMIN LOGIN ----------
+    function AdminLogin({onSuccess, onCancel, onReset}){
+      const [user, setUser] = useState('');
+      const [pass, setPass] = useState('');
+      const tryLogin = (e)=>{
+        e.preventDefault();
+        const OK_USER = 'niki';
+        const OK_PASS = '1212';
+        if(user===OK_USER && pass===OK_PASS){ sessionStorage.setItem('auth_admin','1'); onSuccess(); }
+        else alert('Usuario o contraseña incorrectos');
+      };
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center p-6">
+          <form onSubmit={tryLogin} className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow">
+            <div className="flex items-center gap-3 mb-4"><i className="fas fa-shield-alt text-2xl text-brand-400"></i><h2 className="text-2xl font-bold">Acceso Administrativo</h2></div>
+            <label className="block text-sm mb-1 text-slate-300">Usuario</label>
+            <input className="w-full p-2 rounded text-black mb-3" value={user} onChange={e=>setUser(e.target.value)} placeholder="admin" />
+            <label className="block text-sm mb-1 text-slate-300">Contraseña</label>
+            <input type="password" className="w-full p-2 rounded text-black mb-4" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••" />
+            <div className="flex gap-4">
+              <button type="button" onClick={onCancel} className="flex-1 w-full bg-slate-700 hover:bg-slate-600 py-2 rounded font-semibold">Cancelar</button>
+              <button type="submit" className="flex-1 w-full bg-brand-500 hover:bg-brand-600 py-2 rounded font-semibold">Aceptar</button>
+            </div>
+            <div className="text-center mt-4">
+              <button type="button" onClick={onReset} className="text-sm text-slate-400 hover:text-brand-400 transition-colors">Olvidé mi contraseña</button>
+            </div>
+            <p className="text-xs text-slate-400 mt-3">Consejo: cambia estas credenciales para mejorar tu seguridad.</p>
+          </form>
+        </div>
+      );
+    }
+
+    // ---------- MODAL PARA RESTABLECER CONTRASEÑA ----------
+    function ForgotPasswordModal({ onClose }) {
+      const waMsg = encodeURIComponent("Hola, he olvidado la contraseña del panel de administración de la farmacia. ¿Podrías ayudarme a restablecerla?");
+      return ReactDOM.createPortal(
+        <div className="modal-overlay">
+          <div className="modal-content text-center max-w-sm p-6">
+            <h3 className="text-xl font-bold mb-4">Restablecer Contraseña</h3>
+            <p className="text-slate-300 mb-6">
+              Por motivos de seguridad, no podemos restablecer tu contraseña automáticamente.
+              Por favor, contacta al administrador para que te proporcione una nueva.
+            </p>
+            <a href={`https://wa.me/${PHONE_WHATSAPP}?text=${waMsg}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 rounded-full font-semibold hover:bg-brand-600 transition">
+              <i className="fab fa-whatsapp text-lg"></i> Contactar por WhatsApp
+            </a>
+            <button onClick={onClose} className="mt-4 w-full px-4 py-2 bg-slate-700 rounded-full text-sm font-semibold hover:bg-slate-600 transition">
+              Cerrar
+            </button>
+          </div>
+        </div>,
+        document.body
+      );
+    }
+
+    // ---------- ADMIN PANEL ----------
+    function AdminPanel({productos, setProductos, setPage}){
+      const [form, setForm] = useState({ img:'', nombre:'', marca:'', uso:'', descripcion:'', precio:'', categoria:'medicamentos', stock: 10 });
+      const [editingProduct, setEditingProduct] = useState(null);
+      const [viewingAddModal, setViewingAddModal] = useState(false);
+
+      const addProduct = (newProduct)=>{
+        const nuevo = { ...newProduct, precio: Number(newProduct.precio)||0, stock: Number(newProduct.stock)||0 };
+        setProductos(prev=> [...prev, nuevo]);
+        setForm({ img:'', nombre:'', marca:'', uso:'', descripcion:'', precio:'', categoria:'medicamentos', stock: 10 });
+        setViewingAddModal(false);
+      };
+
+      const startEdit = (product, index) => {
+        setEditingProduct({ product, index });
+      };
+
+      const saveEdit = (updatedProduct) => {
+        if (editingProduct === null) return;
+        setProductos(prev => prev.map((item, idx) => idx === editingProduct.index ? updatedProduct : item));
+        setEditingProduct(null);
+      };
+
+      const deleteProduct = (i)=>{ if(confirm('¿Eliminar este producto?')) setProductos(prev=> prev.filter((_,idx)=> idx!==i)); };
+
+      return (
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-brand-400">Panel Administrativo</h2>
+            <div className="flex gap-2">
+              <button onClick={() => setViewingAddModal(true)} className="bg-brand-500 px-3 py-1 rounded-lg text-sm hover:bg-brand-600 transition">Agregar Producto</button>
+              <button onClick={()=> setPage('home')} className="bg-slate-800 px-3 py-1 rounded">Volver</button>
+              <button onClick={()=>{ sessionStorage.removeItem('auth_admin'); location.reload(); }} className="bg-amber-500 px-3 py-1 rounded">Cerrar sesión</button>
+            </div>
+          </div>
+          
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <h3 className="font-bold mb-3">Inventario Actual</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {productos.map((p,i)=> (
+                <div key={i} className="bg-slate-800 rounded-xl overflow-hidden product-card-hover relative">
+                  <img loading="lazy" src={p.img||'https://medac.es/sites/default/files/styles/img_blog_big_retina/public/blog/destacadas/Farmacia%20hospitalaria.jpg?itok=yhXMoJOv'} className="w-full h-28 object-cover" alt="" />
+                  {p.stock > 0 && p.stock < 5 && (
+                    <span className="absolute top-2 right-2 z-10 px-2 py-1 text-[10px] bg-yellow-400 text-slate-900 rounded-full font-bold">Stock bajo</span>
+                  )}
+                  <div className="p-3">
+                    <p className="font-semibold line-clamp-1">{p.nombre}</p>
+                    <p className="text-xs text-slate-400">{p.marca||'—'}</p>
+                    <p className="text-brand-400 text-sm">{currency(p.precio)}</p>
+                    <p className={`text-xs mt-1 ${p.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      Stock: {p.stock}
+                    </p>
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={()=>startEdit(p, i)} className="flex-1 bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded text-sm">Editar</button>
+                      <button onClick={()=>deleteProduct(i)} className="flex-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-sm">Borrar</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {editingProduct && (
+            <ProductModal
+              product={editingProduct.product}
+              onClose={() => setEditingProduct(null)}
+              onSave={saveEdit}
+              isEditing={true}
+            />
+          )}
+
+          {viewingAddModal && (
+            <ProductModal
+              product={form}
+              onClose={() => setViewingAddModal(false)}
+              onSave={addProduct}
+              isEditing={true}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // ---------- FOOTER ----------
+    function Footer(){
+      return (
+        <footer id="contact" className="bg-slate-950 text-slate-400 py-10 mt-10 border-t border-slate-800">
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-white font-bold mb-3">Virgen de los Remedios</h3>
+              <p>Comprometidos con tu salud desde 2024. Servicio de confianza en Cuevo.</p>
+            </div>
+            <div>
+              <h3 className="text-white font-bold mb-3">Enlaces</h3>
+              <ul className="space-y-2">
+                <li><a href="#home" className="hover:text-brand-400 transition-colors duration-300">Inicio</a></li>
+                <li><a href="#services" className="hover:text-brand-400 transition-colors duration-300">Servicios</a></li>
+                <li><a href="#catalog" className="hover:text-brand-400 transition-colors duration-300">Productos</a></li>
+                <li><a href="#contact" className="hover:text-brand-400 transition-colors duration-300">Contacto</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-bold mb-3">Contacto</h3>
+              <p><strong>WhatsApp:</strong> <a href={`https://wa.me/${PHONE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline">+591 71317450</a></p>
+              <p><strong>Email:</strong> info@virgendelosremedios.com</p>
+            </div>
+          </div>
+          <div className="text-center text-sm mt-8 text-slate-500">© 2025 Farmacia Virgen de los Remedios. Todos los derechos reservados.</div>
+        </footer>
+      );
+    }
+
+    // ---------- FAB BOTÓN WHATSAPP + IR ARRIBA ----------
+    function FloatingActions(){
+      const [showTop, setShowTop] = useState(false);
+      useEffect(()=>{
+        const onScroll = ()=> setShowTop(window.scrollY>400);
+        window.addEventListener('scroll', onScroll);
+        return ()=> window.removeEventListener('scroll', onScroll);
+      },[]);
+      return (
+        <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3">
+          <a href={`https://wa.me/${PHONE_WHATSAPP}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-brand-500 hover:bg-brand-600 grid place-items-center shadow-soft" aria-label="WhatsApp">
+            <i className="fab fa-whatsapp text-2xl text-white"></i>
+          </a>
+          {showTop && (
+            <button onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} className="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 grid place-items-center border border-slate-700" aria-label="Subir">
+              <i className="fas fa-arrow-up"></i>
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ---------- APP ----------
+    function App(){
+	useScrollNavbar();
+      const toast = useToast();
+      const [page, setPage] = useState('home');
+      const [productos, setProductos] = useState(()=>{
+        const raw = localStorage.getItem('productos'); if(raw) try{ return JSON.parse(raw); } catch(e){}
+        return [
+          {img:"imagenes/paracetamol500.jpg", nombre:"Paracetamol 500mg", marca:"Genfar", uso:"Analgésico / Antifebril", descripcion:"Medicamento ideal para el alivio de dolores leves a moderados, como dolores de cabeza, musculares y menstruales. También ayuda a reducir la fiebre de manera efectiva.", precio:6.00, categoria:"medicamentos", stock:15},
+          {img:"imagenes/ibu400.jpg", nombre:"Ibuprofeno 400mg", marca:"Advil", uso:"Antiinflamatorio", descripcion:"Proporciona alivio rápido del dolor, reduce la inflamación y la fiebre. Útil para el dolor de muelas, dolor de espalda y síntomas de la gripe.", precio:8.50, categoria:"medicamentos", stock:8},
+          {img:"imagenes/amoxi500.jpg", nombre:"Amoxicilina 500mg", marca:"MK", uso:"Antibiótico", descripcion:"Un antibiótico de amplio espectro utilizado para tratar una variedad de infecciones bacterianas, como infecciones del oído, garganta y vías respiratorias.", precio:12.99, categoria:"medicamentos", stock:0},
+          {img:"imagenes/lora10.jpg", nombre:"Loratadina 10mg", marca:"Claritin", uso:"Antialérgico", descripcion:"Alivia los síntomas de la rinitis alérgica, como estornudos, secreción nasal y picazón de ojos. No causa somnolencia en la mayoría de las personas.", precio:7.25, categoria:"medicamentos", stock:22},
+          {img:"imagenes/ome20.jpg", nombre:"Omeprazol 20mg", marca:"Prilosec", uso:"Antiácido / Reflujo", descripcion:"Reduce la cantidad de ácido que produce el estómago. Se usa para tratar la acidez estomacal frecuente, el reflujo y las úlceras gástricas.", precio:9.75, categoria:"medicamentos", stock:18},
+          {img:"imagenes/ena10.jpg", nombre:"Enalapril 10mg", marca:"Normopres", uso:"Antihipertensivo", descripcion:"Medicamento para controlar la presión arterial alta (hipertensión) y prevenir complicaciones cardiovasculares.", precio:11.50, categoria:"medicamentos", stock:5},
+          {img:"imagenes/met850.jpg", nombre:"Metformina 850mg", marca:"Glucophage", uso:"Diabetes tipo 2", descripcion:"Ayuda a controlar los niveles de azúcar en la sangre en personas con diabetes tipo 2, mejorando la respuesta del cuerpo a la insulina.", precio:13.99, categoria:"medicamentos", stock:20},
+          {img:"imagenes/salbu.jpg", nombre:"Salbutamol 100mcg", marca:"Ventolin", uso:"Asma / Bronquitis", descripcion:"Un broncodilatador de acción rápida para aliviar los síntomas del asma y la EPOC, como la dificultad para respirar y la opresión en el pecho.", precio:10.25, categoria:"medicamentos", stock:0},
+          {img:"imagenes/diclo50.jpg", nombre:"Diclofenaco 50mg", marca:"Voltaren", uso:"Dolor / Inflamación", descripcion:"Un potente antiinflamatorio no esteroideo (AINE) para tratar el dolor, la inflamación y la rigidez causados por la artritis, lesiones y otras afecciones.", precio:8.99, categoria:"medicamentos", stock:25},
+          {img:"imagenes/napro550.jpg", nombre:"Naproxeno 550mg", marca:"Flanax", uso:"Dolor / Fiebre", descripcion:"Proporciona alivio prolongado del dolor y la inflamación. Es efectivo para dolores menstruales, de cabeza, musculares y artritis.", precio:7.75, categoria:"medicamentos", stock:12},
+          {img:"imagenes/acetil200.jpg", nombre:"Acetilcisteína 200mg", marca:"Fluimucil", uso:"Mucolítico / Tos", descripcion:"Ayuda a fluidificar y expulsar la mucosidad de los pulmones, facilitando la respiración en casos de tos con flema y resfriados.", precio:9.50, categoria:"medicamentos", stock:30},
+          {img:"imagenes/cetirizina.jpg", nombre:"Cetirizina 10mg", marca:"Zyrtec", uso:"Alergias", descripcion:"Un antihistamínico eficaz para el alivio de los síntomas de las alergias, incluyendo estornudos, picazón y urticaria.", precio:6.50, categoria:"medicamentos", stock:40},
+          {img:"imagenes/azitromicina.jpg", nombre:"Azitromicina 500mg", marca:"Zithromax", uso:"Antibiótico", descripcion:"Antibiótico macrólido para el tratamiento de infecciones de las vías respiratorias superiores e inferiores, infecciones de la piel y de transmisión sexual.", precio:15.00, categoria:"medicamentos", stock:10},
+          {img:"imagenes/losartan.jpg", nombre:"Losartán 50mg", marca:"Cozaar", uso:"Presión arterial", descripcion:"Ayuda a relajar los vasos sanguíneos para que la sangre fluya con más facilidad, reduciendo la presión arterial alta.", precio:10.00, categoria:"medicamentos", stock:15},
+          {img:"imagenes/prednisona.jpg", nombre:"Prednisona 5mg", marca:"Dacortin", uso:"Corticoide", descripcion:"Corticosteroide utilizado para tratar una variedad de afecciones, incluyendo trastornos inflamatorios y autoinmunes.", precio:5.50, categoria:"medicamentos", stock:5},
+          {img:"imagenes/furosemida.jpg", nombre:"Furosemida 40mg", marca:"Diurético", uso:"Retención de líquidos", descripcion:"Conocido como un 'diurético de asa', ayuda al cuerpo a deshacerse del exceso de sal y agua, aliviando la hinchazón y la retención de líquidos.", precio:6.75, categoria:"medicamentos", stock:10},
+          {img:"imagenes/clonazepam.jpg", nombre:"Clonazepam 2mg", marca:"Rivotril", uso:"Ansiedad / Convulsiones", descripcion:"Benzodiazepina utilizada para tratar trastornos de pánico, ansiedad y ciertos tipos de convulsiones.", precio:12.00, categoria:"medicamentos", stock:7},
+          {img:"imagenes/insulina.jpg", nombre:"Insulina", marca:"Humalog", uso:"Diabetes tipo 1", descripcion:"Una forma de hormona que ayuda a las personas con diabetes a utilizar los carbohidratos de los alimentos para obtener energía, controlando los niveles de glucosa en sangre.", precio:35.00, categoria:"medicamentos", stock:3},
+          {img:"imagenes/acetaminofen.jpg", nombre:"Acetaminofén 500mg", marca:"Tylenol", uso:"Dolor / Fiebre", descripcion:"Analgésico y antifebril de uso común para aliviar dolores de cabeza, resfriados y reducir la fiebre.", precio:7.00, categoria:"medicamentos", stock:20},
+          {img:"imagenes/ranitidina.jpg", nombre:"Ranitidina 150mg", marca:"Zantac", uso:"Acidez / Úlceras", descripcion:"Un medicamento que reduce la cantidad de ácido en el estómago, utilizado para tratar la acidez estomacal, el reflujo y las úlceras.", precio:8.50, categoria:"medicamentos", stock:15},
+          {img:"imagenes/panal.jpg", nombre:"Pañales Huggies", marca:"Huggies", uso:"Higiene de bebés", descripcion:"Pañales absorbentes que mantienen a tu bebé seco y cómodo por más tiempo. Con barreras anti-fugas y material suave para proteger su delicada piel.", precio:85.00, categoria:"bebes", stock:5},
+          {img:"imagenes/leche_infantil.jpg", nombre:"Leche Infantil NAN 1", marca:"Nestlé", uso:"Alimentación infantil", descripcion:"Fórmula infantil completa, enriquecida con vitaminas y minerales para un desarrollo saludable de los bebés desde el nacimiento.", precio:120.00, categoria:"bebes", stock:3},
+          {img:"imagenes/toallitas.jpg", nombre:"Toallitas húmedas Pampers", marca:"Pampers", uso:"Limpieza para bebés", descripcion:"Toallitas suaves y resistentes, perfectas para la limpieza de la piel sensible de tu bebé durante el cambio de pañal o en cualquier momento del día.", precio:25.00, categoria:"bebes", stock:10},
+          {img:"imagenes/shampoo.jpg", nombre:"Shampoo Anticaspa", marca:"Head & Shoulders", uso:"Cuidado del cabello", descripcion:"Combate la caspa y previene su reaparición, dejando el cabello limpio, fresco y con una sensación de ligereza. Apto para uso diario.", precio:35.00, categoria:"cuidado", stock:20},
+          {img:"imagenes/pasta_dental.jpg", nombre:"Pasta Dental Colgate", marca:"Colgate", uso:"Higiene bucal", descripcion:"Protege contra la caries y el sarro, manteniendo los dientes limpios y un aliento fresco durante todo el día.", precio:15.00, categoria:"cuidado", stock:30},
+          {img:"imagenes/jabon.jpg", nombre:"Jabón Neutro", marca:"Dove", uso:"Cuidado de la piel", descripcion:"Jabón suave y sin fragancia, ideal para pieles sensibles y delicadas. Limpia sin resecar, dejando la piel hidratada y suave.", precio:10.00, categoria:"cuidado", stock:50},
+        ];
+      });
+
+      const [cart, setCart] = useState(()=>{
+        const raw = localStorage.getItem('cart'); if(raw) try{ return JSON.parse(raw); } catch(e){}
+        return [];
+      });
+      const [cartOpen, setCartOpen] = useState(false);
+      const [adminAuthed, setAdminAuthed] = useState(()=> sessionStorage.getItem('auth_admin')==='1');
+      const [showResetModal, setShowResetModal] = useState(false);
+
+      useEffect(()=>{ localStorage.setItem('productos', JSON.stringify(productos)); }, [productos]);
+      useEffect(()=>{ localStorage.setItem('cart', JSON.stringify(cart)); }, [cart]);
+
+      const addToCart = (p)=>{
+        if(p.stock <= 0) {
+          toast.show('Este producto está agotado.');
+          return;
+        }
+
+        setCart(prev=>{
+          const key = `${p.nombre}-${p.marca}-${p.precio}`;
+          const exists = prev.find(i=> i.key===key);
+          if(exists) return prev.map(i=> i.key===key? {...i, cant: Math.min(p.stock, (i.cant||1)+1) } : i);
+          return [...prev, { key, img:p.img, nombre:p.nombre, marca:p.marca, precio:Number(p.precio)||0, cant:1 }];
+        });
+        setCartOpen(true);
+      };
+
+      const finalizeOrder = ()=>{
+        const total = cart.reduce((s,i)=> s + (i.precio*(i.cant||1)), 0);
+        const lines = cart.map(i=> `• ${i.cant||1} x ${i.nombre}${i.marca? ' ('+i.marca+')':''} — ${currency(i.precio*(i.cant||1))}`);
+        const msg = `Hola! Quiero realizar este pedido:%0A%0A${encodeURIComponent(lines.join('%0A'))}%0A%0A*Total:* ${encodeURIComponent(currency(total))}%0A%0A¿Podrían confirmarme stock?`;
+        
+        setProductos(prevProductos => {
+            const newProductos = [...prevProductos];
+            cart.forEach(cartItem => {
+                const prodIndex = newProductos.findIndex(p => `${p.nombre}-${p.marca}-${p.precio}` === cartItem.key);
+                if (prodIndex !== -1) {
+                    newProductos[prodIndex].stock -= (cartItem.cant || 1);
+                }
+            });
+            return newProductos;
+        });
+        
+        setCart([]); // Se vacía el carrito
+        window.open(`https://wa.me/${PHONE_WHATSAPP}?text=${msg}`,'_blank');
+        toast.show('¡Pedido enviado! Revisa WhatsApp.');
+        setCartOpen(false);
+      };
+
+      return (
+        <div className="bg-[#0f172a] min-h-screen">
+          <Navbar setPage={setPage} cartCount={cart.reduce((s,i)=> s + (i.cant||1),0)} onOpenCart={()=>setCartOpen(true)} />
+          <CartDrawer cart={cart} setCart={setCart} open={cartOpen} onFinalize={finalizeOrder} onClose={()=>setCartOpen(false)} toast={toast} productos={productos} />
+          <FloatingActions />
+          <Toast open={toast.open} msg={toast.msg} />
+
+          {page==='home' && (
+            <>
+              <Hero />
+              <Info />
+              <Servicios />
+              <Catalogo productos={productos} onAddToCart={addToCart} toast={toast} />
+              <Footer />
+            </>
+          )}
+
+          {page==='admin' && (
+            adminAuthed ? (
+              <AdminPanel productos={productos} setProductos={setProductos} setPage={setPage} />
+            ) : (
+              <AdminLogin 
+                onSuccess={()=>{ sessionStorage.setItem('auth_admin','1'); setAdminAuthed(true); }} 
+                onCancel={() => setPage('home')}
+                onReset={() => setShowResetModal(true)}
+              />
+            )
+          )}
+          {showResetModal && <ForgotPasswordModal onClose={() => setShowResetModal(false)} />}
+          <ProductSchemaMarkup productos={productos} />
+        </div>
+      );
+    }
+    
+    // Componente para el marcado de esquema de producto
+    function ProductSchemaMarkup({ productos }) {
+      const schemas = productos.map(p => ({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": p.nombre,
+        "image": p.img || "https://medac.es/sites/default/files/styles/img_blog_big_retina/public/blog/destacadas/Farmacia%20hospitalaria.jpg",
+        "description": p.descripcion || p.uso,
+        "brand": {
+          "@type": "Brand",
+          "name": p.marca || "Marca Desconocida"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": window.location.href, // En una SPA, se usa la URL principal
+          "priceCurrency": "BOB",
+          "price": p.precio,
+          "availability": p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        }
+      }));
+
+      const scriptContent = JSON.stringify(schemas, null, 2);
+
+      return (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: scriptContent }}
+        />
+      );
+    }
+
+    // Montar
+    try{
+      ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    } catch(err){
+      console.error("Error al cargar la aplicación React:", err);
+      const el = document.getElementById('root');
+      el.innerHTML = `<div style="padding:16px;margin:16px;border-radius:12px;background:#111827;color:#e5e7eb;border:1px solid #1f2937">Ocurrió un error al cargar la aplicación. Si estás sin internet, los recursos de React y Babel pueden no haber cargado correctamente. Revisa la consola (F12) para más detalles.</div>`;
+    }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Pharmacy",
+    "name":"Farmacia Virgen de los Remedios",
+    "address":{
+      "@type":"PostalAddress",
+      "streetAddress":"Calle Sucre, entre Bolívar y 6 de Agosto",
+      "addressLocality":"Cuevo",
+      "addressRegion":"Santa Cruz",
+      "addressCountry":"BO"
+    },
+    "telephone":"+59171317450",
+    "image":"https://images.unsplash.com/photo-1614975470486-613b87ec6dcd?auto=format&fit=crop&w=1470&q=80",
+    "openingHours":"Mo-Su 12:00-15:00,19:00-23:59"
+  }
+  </script>
+</body>
+</html>
